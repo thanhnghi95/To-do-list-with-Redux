@@ -1,28 +1,39 @@
 import { Col, Row, Input, Button, Select, Tag } from 'antd';
-import { v4 as uuidv4 } from 'uuid';
 import Todo from './Todo';
-import { useDispatch } from 'react-redux';
-import { addTodo } from '../redux/action';
+import {todoRemainingSelector} from '../redux/selectors'
 import { useState } from 'react';
+import { useDispatch , useSelector } from 'react-redux';
+import {addTodo} from '../redux/action'
+import {v4 as uuidv4} from 'uuid'
 
 const TodoList = () => {
-    const dispatch = useDispatch()
     const [todoName, setTodoName]= useState('')
     const [priority , setPriority] = useState("Medium")
-    const handleAddButton = () =>{
-      dispatch(addTodo({
-        id:uuidv4(),
+    const todoList = useSelector(todoRemainingSelector)
+
+    const dispath = useDispatch()
+    const handleAddButton = ()=>{
+      dispath(addTodo({
+        id: uuidv4(),
         name:todoName,
         completed:false,
-        prioriry:priority
+        priority:priority
       }))
-    } 
+      setTodoName('');
+      setPriority("Medium")
+    }
+ 
     return (
         <Row style={{ height: 'calc(100% - 40px)' }}>
         <Col span={24} style={{ height: 'calc(100% - 40px)', overflowY: 'auto' }}>
-          <Todo name='Learn React' prioriry='High' />
-          <Todo name='Learn Redux' prioriry='Medium' />
-          <Todo name='Learn JavaScript' prioriry='Low' />
+        {todoList.map( (todo) =>(
+          <Todo key={todo.id} 
+                name={todo.name} 
+                id={todo.id}
+                completed={todo.completed} 
+                priority={todo.priority}
+          />
+        ))}
         </Col>
         <Col span={24}>
           <Input.Group style={{ display: 'flex' }} compact>
